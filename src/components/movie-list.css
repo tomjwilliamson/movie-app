@@ -1,0 +1,39 @@
+.container {
+	width: 75%;
+}
+
+.flex-grid {
+	display: flex;
+	justify-content: space-evenly;
+	flex-wrap: wrap;
+  
+}
+
+.movie-item {
+	flex: 0 1 calc(25% - 1em);
+	padding: 10px;
+	margin-bottom: 20px;
+	border: 1px solid red;
+	min-height: 250px;
+	align-items: flex-end;
+	justify-content: center;
+}
+
+.movie-item h3 {
+	margin: 0 0 10px 0;
+	padding: 0;
+	font-size: 12px;
+}
+
+.movie-item img {
+	flex-grow: 1;
+	width: 100%;
+	margin: 0 auto;
+}
+
+.movie-item p {
+	margin: 10px 0 0 0;
+	padding: 0;
+	font-size: 10px;
+	font-style: italic;
+}
