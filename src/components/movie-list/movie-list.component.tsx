@@ -1,7 +1,7 @@
 import React, { Fragment } from 'react';
 // models
-import IMovieItem from '../models/movie-item.interface';
-import IGenreItem from '../models/genre-item.interface';
+import IMovieItem from '../../models/movie-item.interface';
+import IGenreItem from '../../models/genre-item.interface';
 // libs
 import { cloneDeep } from 'lodash';
 

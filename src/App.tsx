@@ -1,7 +1,8 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import axios from 'axios';
 // components
-import MovieListComponent from './components/movie-list.component';
+import MovieListComponent from './components/movie-list/movie-list.component';
+import GenreFiltersComponent from './components/genre-filters/genre-filters.component';
 // models
 import IMovieItem from './models/movie-item.interface';
 import IGenreItem from './models/genre-item.interface';
@@ -16,6 +17,7 @@ interface IState {
   imagesSizes: Array<string>;
   genreList: Array<IGenreItem>;
   genreStringsCreated: boolean;
+  selectedFilters: Array<number>;
   key: string;
   dataLoaded: boolean;
 }
@@ -38,6 +40,7 @@ class App extends React.Component<any, IState> {
       genreList: [],
       genreStringsCreated: false,
       key: 'e6b4ece6ed304578d02498d86fdd2c16',
+      selectedFilters: [],
       dataLoaded: false
     }
   }
@@ -51,7 +54,7 @@ class App extends React.Component<any, IState> {
     this.getData(API_PATH + GET_MOVIES, GetDataType[0]);
   }
 
-  componentDidUpdate() {
+  componentDidUpdate(prevProps: any, prevState: IState) {
     if (this.state.movieData !== null && this.state.genreList.length > 0 && !this.state.genreStringsCreated) {
       this.createGenreStrings();
     }
@@ -59,6 +62,11 @@ class App extends React.Component<any, IState> {
     if (this.state.movieData !== null && this.state.genreList.length > 0 && this.state.baseUrl !== '' && this.state.imagesSizes.length > 0 && this.state.genreStringsCreated && !this.state.dataLoaded) {
       this.setState({dataLoaded: true});
     }
+
+    if (prevState.selectedFilters.length !== this.state.selectedFilters.length) {
+      this.filterMovieListByGenre();
+    }
+
   }
 
   getData(path: string, type: string) {
@@ -100,7 +108,31 @@ class App extends React.Component<any, IState> {
       movieData: newMovieData,
       genreStringsCreated: true
     });
-	}
+  }
+
+  filterMovieListByGenre = () => {
+    let newMovieData = cloneDeep(this.state.movieData);
+    const filteredData: any = [];
+
+    newMovieData.results.map((i: IMovieItem) => {
+      i.genre_ids.filter(x => {
+        console.log(this.state.selectedFilters.includes(x));
+        if (this.state.selectedFilters.includes(x)) {
+          filteredData.push(i);
+        }
+      });
+    });
+
+    console.log(filteredData);
+
+    console.log(newMovieData);
+
+  }
+  
+  handleFilterChange = (filters: Array<number>) => {
+    console.log(filters);
+    this.setState({selectedFilters: filters});
+  }
 
   render() {
     return (
@@ -109,7 +141,10 @@ class App extends React.Component<any, IState> {
           <h1>Movie list</h1>
         </header>
         {this.state.dataLoaded ?
-          <MovieListComponent data={this.state.movieData} imageUrl={this.state.baseUrl} imageSizes={this.state.imagesSizes} genreList={this.state.genreList}></MovieListComponent>
+          <Fragment>
+            <GenreFiltersComponent genreList={this.state.genreList} submitNewFilters={(e: any) => this.handleFilterChange(e)}></GenreFiltersComponent>
+            <MovieListComponent data={this.state.movieData} imageUrl={this.state.baseUrl} imageSizes={this.state.imagesSizes} genreList={this.state.genreList}></MovieListComponent>
+          </Fragment>
           : <p>Loading</p>
         }
       </div>
