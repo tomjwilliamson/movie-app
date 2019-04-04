@@ -13,6 +13,7 @@ interface IState {
 	imageSizes: Array<string>;
 	genreList: Array<IGenreItem>;
 	movieListItems: any;
+	sortCount: number;
 }
 
 interface IProps {
@@ -31,7 +32,8 @@ class MovieListComponent extends React.Component<IProps, IState> {
 			imageUrl: props.imageUrl,
 			imageSizes: props.imageSizes,
 			genreList: props.genreList,
-			movieListItems: null
+			movieListItems: null,
+			sortCount: 0
     };
 	}
 
@@ -40,19 +42,27 @@ class MovieListComponent extends React.Component<IProps, IState> {
 		this.sortListByPopularity();
 	}
 
+	componentDidUpdate(prevProps: IProps, prevState: IState) {
+		// if the sort count has changed
+		if (prevState.sortCount !== this.state.sortCount) {
+			// render list
+			this.renderMovieList();
+		}
+	}
+
 	sortListByPopularity = () => {
+		// clone the state data before sorting - stop mutate
 		let newMovieData = cloneDeep(this.state.data);
-		// newMovieData.results[0].popularity = 1;
-		// console.log(newMovieData);
+		// sort the result set based on popularity
+		newMovieData.results.sort((a: IMovieItem, b: IMovieItem) => { return b.popularity - a.popularity; });
 
-		newMovieData.results.sort((a: IMovieItem, b: IMovieItem) => {
-			// console.log(a.popularity, b.popularity);
-			return a.popularity - b.popularity;
+		// increment a sortCount value - helps to render the view after the state has updated
+		// and stops any loop errors in lifecycle events
+		const count = this.state.sortCount + 1;
+		this.setState({
+			data: newMovieData,
+			sortCount: count
 		});
-
-		this.setState({data: newMovieData});
-		this.renderMovieList();
-
 	}
 	
 	renderMovieList = () => {
